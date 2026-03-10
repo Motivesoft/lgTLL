@@ -1,0 +1,23 @@
+{
+  "name": "lgtll",
+  "version": "1.0.0",
+  "description": "Utility for working with LG TLL files",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Motivesoft/lgTLL.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Motivesoft/lgTLL/issues"
+  },
+  "homepage": "https://github.com/Motivesoft/lgTLL#readme",
+  "dependencies": {
+    "xml2js": "^0.6.2"
+  }
+}
