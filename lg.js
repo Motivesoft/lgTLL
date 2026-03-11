@@ -48,16 +48,28 @@ fs.readFile(filePath, (err, data) => {
 
     // Normalize to an array of channel nodes
     const channels = [];
-    const pushChannels = obj => {
+    let index = 1;
+    const pushChannels = (obj, idx = index) => {
       if (!obj) return;
       if (Array.isArray(obj)) {
-        obj.forEach(pushChannels);
+        obj.forEach(item=>pushChannels(item,idx));
       } else if (obj.ITEM || obj.Channel || obj.channel) {
         const list = obj.ITEM || obj.Channel || obj.channel;
-        if (Array.isArray(list)) channels.push(...list);
-        else channels.push(list);
+        if (Array.isArray(list)) {
+          list.forEach(item => {
+              item.originalIndex = index++;
+              channels.push(item);
+            });
+        }
+        else {
+          list.originalIndex = index++;
+          channels.push(list);
+        } 
       } else if (Array.isArray(obj)) {
-        channels.push(...obj);
+          obj.forEach(item => {
+            item.originalIndex = index++;
+            channels.push(item);
+          });
       }
     };
 
@@ -87,7 +99,11 @@ fs.readFile(filePath, (err, data) => {
           0;
         return parseInt(typeof num === 'object' ? num._ || num : num) || 0;
       };
-      return getNum(a) - getNum(b);
+
+      // ** Toggle to sort by original or revised channel order
+      // return getNum(a) - getNum(b);
+      return a.originalIndex - b.originalIndex;
+      // **
     });
 
     // Try common field names for program number and name (varies by model/format).[web:6][web:9]
@@ -116,6 +132,10 @@ fs.readFile(filePath, (err, data) => {
       const n2 =
         ch.physicalNum;
 
+      let idx = ch.originalIndex;
+      while (idx.length < 4) {
+        idx = ' '+idx;
+      }
       // nameStr = typeof name === 'object' && name._ ? name._ : name;
 
       numStr = typeof num === 'object' && num._ ? num._ : num;
@@ -135,7 +155,7 @@ fs.readFile(filePath, (err, data) => {
 
       if (numStr != null || nameStr != null) {
         //console.log(`${numStr ?? ''}\t${hintStr}\t${nameStr ?? ''}`);
-        console.log(`${numStr ?? ''}\t${nameStr ?? ''}`);
+        console.log(`${idx}\t${numStr ?? ''}\t${nameStr ?? ''}`);
       }
     });
   });
