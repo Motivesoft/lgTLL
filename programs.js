@@ -12,13 +12,103 @@ const outputFile = inputFile.replace(/\.tll$/, '_modified.tll');
 const xmlData = fs.readFileSync(inputFile, 'utf8');
 const doc = new DOMParser().parseFromString(xmlData, 'text/xml');
 
+const prNameToPrNumMap = {
+  "La 1 HD": "1",
+  "La 2 HD": "2",
+  "antena3 HD": "3",
+  "Cuatro HD": "4",
+  "Telecinco HD": "5",
+  "laSexta HD": "6",
+  "Energy": "7",
+  "La 8 Mediterráneo HD": "8",
+  "A Punt HD": "9",
+  "TEN": "10",
+  "FDF": "11",
+  "PARAMOUNT NETWORK": "12",
+  "TRECE": "13",
+  "Divinity": "14",
+  "neox": "16",
+  "atreseries HD": "17",
+  "BOM": "18",
+  "nova": "19",
+  "DKISS": "20",
+  "BeMad tv HD": "21",
+  "DMAX": "22",
+  "GOL PLAY HD": "23",
+  "mega HD": "24",
+  "24h HD": "30",
+  "tdp HD": "31",
+  "Realmadrid TV HD": "32",
+  "Boing": "40",
+  "Disney Channel": "41",
+  "Clan HD": "42",
+  "La 1 UHD": "51",
+  "Die Neue Zeit TV": "60",
+  "SENDER NEU JERUSALEM": "61",
+  "Eurosport 1 Deutschland": "62",
+  "RTL Austria": "63",
+  "RTLZWEI Austria": "64",
+  "Rai YoYo HD": "65",
+  "Rai Radio 2 Visual": "66",
+  "SUPER RTL A": "67",
+  "VOX Austria": "68",
+  "La 2": "80",
+  "tdp": "81",
+  "Clan": "82",
+  "Cuatro": "83",
+  "antena3": "84",
+  "24h": "85",
+  "laSexta": "86",
+  "Telecinco": "87",
+  "BBC One Lon HD": "101",
+  "BBC Two Wal HD": "102",
+  "ITV1": "103",
+  "Channel 4": "104",
+  "BBC Four HD": "114",
+  "STV": "121",
+  "ITV2": "122",
+  "ITV3+1": "123",
+  "ITV4+1": "124",
+  "e4": "133",
+  "E4+1": "134",
+  "E4 Extra": "135",
+  "Film4+1": "136",
+  "More4": "137",
+  "CBeebies HD": "140",
+  "CITV": "141",
+  "Radio 5 RNE": "16385",
+  "RNE Murcia": "16386",
+  "MELODIA FM": "16387",
+  "ONDA CERO": "16388",
+  "CADENA 100": "16389",
+  "RADIO MARIA": "16390",
+  "Kiss FM": "16391",
+  "LOS40": "16392",
+  "Radio Clasica HQ RNE": "16393",
+  "RADIO MARCA": "16394",
+  "Radio Exterior RNE": "16395",
+  "Radio3 HQ RNE": "16396",
+  "EUROPA FM": "16397",
+  "DIAL": "16398",
+  "esRadio": "16399",
+  "HIT FM": "16400",
+  "Radiolé": "16401",
+  "LOS40 Urban": "16402",
+};
+
+
 // Recursive function to find and update prNum based on vchName
 function updatePrNums(node) {
   // Update current node if it has both vchName and prNum
   const vchNameEl = node.getElementsByTagName('vchName')[0];
   const prNumEl = node.getElementsByTagName('prNum')[0];
   if (vchNameEl && prNumEl) {
-    prNumEl.textContent = vchNameEl.textContent;
+    const vchNameValue = vchNameEl.textContent.trim();
+    if (prNameToPrNumMap.hasOwnProperty(vchNameValue)) {
+      prNumEl.textContent = prNameToPrNumMap[vchNameValue];
+    } else {
+      console.log(`No mapping found for prName "${vchNameValue}" (${prNumEl.textContent}) - skipping update`);
+    }
   }
 
   // Recurse into children

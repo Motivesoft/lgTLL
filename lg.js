@@ -101,8 +101,8 @@ fs.readFile(filePath, (err, data) => {
       };
 
       // ** Toggle to sort by original or revised channel order
-      // return getNum(a) - getNum(b);
-      return a.originalIndex - b.originalIndex;
+      return getNum(a) - getNum(b);
+      //return a.originalIndex - b.originalIndex;
       // **
     });
 
