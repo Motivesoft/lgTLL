@@ -1,5 +1,5 @@
 const fs = require('fs');
-const { XMLParser, XMLBuilder } = require('fast-xml-parser');
+const { DOMParser, XMLSerializer } = require('xmldom');
 
 if (process.argv.length !== 3) {
   console.error('Usage: node app.js <input.xml>');
@@ -10,45 +10,36 @@ const inputFile = process.argv[2];
 const outputFile = inputFile.replace(/\.tll$/, '_modified.tll');
 
 const xmlData = fs.readFileSync(inputFile, 'utf8');
-const parser = new XMLParser({
-  ignoreAttributes: true,
-  attributeNamePrefix: '',
-  textNodeName: '#text'
-});
-let jsonObj = parser.parse(xmlData);
+const doc = new DOMParser().parseFromString(xmlData, 'text/xml');
 
-function processNode(node) {
-  if (node && typeof node === 'object') {
-    if (Array.isArray(node)) {
-      for (let item of node) {
-        processNode(item);
-      }
-    } else {
-      // Check if current node has vchName
-      if ('vchName' in node && node.vchName !== undefined) {
-        const prNewNum = node.vchName;
-        // Set prNum to prNameValue if present
-        if ('prNum' in node) {
-          node.prNum = prNewNum;
-        }
-      }
-      // Recurse into children
-      for (let key in node) {
-        if (key !== 'vchName' && key !== 'prNum') {
-          processNode(node[key]);
-        }
-      }
+// Recursive function to find and update prNum based on vchName
+function updatePrNums(node) {
+  // Update current node if it has both vchName and prNum
+  const vchNameEl = node.getElementsByTagName('vchName')[0];
+  const prNumEl = node.getElementsByTagName('prNum')[0];
+  if (vchNameEl && prNumEl) {
+    prNumEl.textContent = vchNameEl.textContent;
+  }
+
+  // Recurse into children
+  for (let i = 0; i < node.childNodes.length; i++) {
+    const child = node.childNodes[i];
+    if (child.nodeType === 1) { // Element node
+      updatePrNums(child);
     }
   }
 }
 
-processNode(jsonObj);
+// Start from document element (root)
+updatePrNums(doc.documentElement);
 
-const builder = new XMLBuilder({
-  format: true,
-  indentBy: '  '
-});
-const modifiedXml = builder.build(jsonObj);
+const serializer = new XMLSerializer();
+let modifiedXml = serializer.serializeToString(doc);
+
+// Pretty print with 2-space indentation
+modifiedXml = modifiedXml.replace(/></g, '>\n  <').replace(/>\n  <\/[^>]+>/g, '></');
+modifiedXml = modifiedXml.split('\n').map(line => line.trimStart()).join('\n');
+modifiedXml = modifiedXml.replace(/\n  \n/g, '\n');
 
 fs.writeFileSync(outputFile, modifiedXml, 'utf8');
 console.log(`Modified XML written to ${outputFile}`);

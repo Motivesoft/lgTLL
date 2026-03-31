@@ -18,7 +18,6 @@
   },
   "homepage": "https://github.com/Motivesoft/lgTLL#readme",
   "dependencies": {
-    "fast-xml-parser": "^5.5.9",
-    "xml2js": "^0.6.2"
+    "xmldom": "^0.6.0"
   }
 }
