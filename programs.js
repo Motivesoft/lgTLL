@@ -7,7 +7,7 @@ if (process.argv.length !== 3) {
 }
 
 const inputFile = process.argv[2];
-const outputFile = inputFile.replace(/\.tll$/, '_modified.tll');
+const outputFile = inputFile.replace(/\.TLL$/, '_modified.TLL');
 
 const xmlData = fs.readFileSync(inputFile, 'utf8');
 const doc = new DOMParser().parseFromString(xmlData, 'text/xml');
@@ -108,10 +108,14 @@ function updatePrNums(node) {
   // Update current node if it has both vchName and prNum
   const vchNameEl = node.getElementsByTagName('vchName')[0];
   const prNumEl = node.getElementsByTagName('prNum')[0];
+  const isUserSelCHNo = node.getElementsByTagName('isUserSelCHNo')[0];
   if (vchNameEl && prNumEl) {
     const vchNameValue = vchNameEl.textContent.trim();
     if (prNameToPrNumMap.hasOwnProperty(vchNameValue)) {
       prNumEl.textContent = prNameToPrNumMap[vchNameValue];
+      if (isUserSelCHNo) {
+        isUserSelCHNo.textContent = '1';
+      }
     } else {
       console.log(`No mapping found for prName "${vchNameValue}" (${prNumEl.textContent}) - skipping update`);
     }
